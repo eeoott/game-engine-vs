@@ -1,44 +1,24 @@
-﻿// ConsoleApplication1.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
+#include "WindowsApplication.hpp"
 
-#include <iostream>
 #include <tchar.h>
 #include <stdio.h>
-#include <windows.h>
-#include <windowsx.h>
+using namespace GEVS;
 
-// this is the main message handler for the program
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    // sort through and find what code to run for the message given
-    switch (message) {
-    case WM_PAINT:
-        // we will replace this part with Rendering Module
-    {
-        printf("paint!\n");
-    }
-    break;
 
-    // this message is read when the window is closed
-    case WM_DESTROY: {
-        // close the application entirely
-        PostQuitMessage(0);
-        return 0;
-    }
-    }
-
-    // Handle any messages the switch statement didn't
-    return DefWindowProc(hWnd, message, wParam, lParam);
+namespace GEVS {
+    GfxConfiguration config(8, 8, 8, 8, 32, 0, 0, 960, 540, L"Game Engine From Scratch (Windows)");
+    WindowsApplication  g_App(config);
+    IApplication*       g_pApp = &g_App;
 }
 
-int Initialize()
+int GEVS::WindowsApplication::Initialize()
 {
-    int result = 0;
+    int result;
 
+    result = BaseApplication::Initialize();
 
-
-    WCHAR appName[10] = { '\0' };
-    wcscpy_s(appName, L"GameEngin");
+    if (result != 0)
+        exit(result);
 
     // get the HINSTANCE of the Console Program
     HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -66,12 +46,12 @@ int Initialize()
     // create the window and use the result as the handle
     hWnd = CreateWindowExW(0,
                            L"GameEngineFromScratch",      // name of the window class
-                           appName,             // title of the window
+                           m_Config.appName,             // title of the window
                            WS_OVERLAPPEDWINDOW,              // window style
                            CW_USEDEFAULT,                    // x-position of the window
                            CW_USEDEFAULT,                    // y-position of the window
-                           800,             // width of the window
-                           600,            // height of the window
+                           m_Config.screenWidth,             // width of the window
+                           m_Config.screenHeight,            // height of the window
                            NULL,                             // we have no parent window, NULL
                            NULL,                             // we aren't using menus, NULL
                            hInstance,                        // application handle
@@ -83,7 +63,11 @@ int Initialize()
     return result;
 }
 
-void Tick()
+void GEVS::WindowsApplication::Finalize()
+{
+}
+
+void GEVS::WindowsApplication::Tick()
 {
     // this struct holds Windows event messages
     MSG msg;
@@ -100,19 +84,25 @@ void Tick()
     }
 }
 
-int main(int argc, char** argv)
+// this is the main message handler for the program
+LRESULT CALLBACK GEVS::WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    int ret;
+    // sort through and find what code to run for the message given
+    switch (message) {
+    case WM_PAINT:
+        // we will replace this part with Rendering Module
+    {
+    } break;
 
-    if ((ret = Initialize()) != 0) {
-        printf("App Initialize failed, will exit now.");
-        return ret;
+    // this message is read when the window is closed
+    case WM_DESTROY: {
+        // close the application entirely
+        PostQuitMessage(0);
+        BaseApplication::m_bQuit = true;
+        return 0;
+    }
     }
 
-    while (true) {
-        Tick();
-    }
-
-    return 0;
+    // Handle any messages the switch statement didn't
+    return DefWindowProc(hWnd, message, wParam, lParam);
 }
-

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Allocator.h"
+#include "Allocator.hpp"
 #include <cassert>
 #include <cstring>
 
@@ -36,7 +36,7 @@ void GEVS::Allocator::Reset(size_t data_size, size_t page_size, size_t alignment
 
     size_t minimal_size = (sizeof(BlockHeader) > m_szDataSize) ? sizeof(BlockHeader) : m_szDataSize;
     // this magic only works when alignment is 2^n, which should general be the case
-    // because most CPU/GPU also requires the aligment be in 2^n
+    // because most CPU/GPU also requires the alignment be in 2^n
     // but still we use a assert to guarantee it
 #if defined(_DEBUG)
     assert(alignment > 0 && ((alignment & (alignment - 1))) == 0);
